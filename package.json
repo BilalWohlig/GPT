@@ -1,0 +1,102 @@
+{
+    "name": "wohlig-framework",
+    "version": "1.0.0",
+    "description": "Wohlig Framework",
+    "main": "app.js",
+    "module": "main.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/WohligTechnology/WohligFramework.git"
+    },
+    "author": "Chintan Shah <chintan@wohlig.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "nodemon index.js",
+        "build": "docker build -t wohlig/wohlig-framework:latest .",
+        "serve": "docker run -p 3000:3000 wohlig/wohlig-framework:latest",
+        "prepare": "husky install",
+        "format": "prettier --write ."
+    },
+    "dependencies": {
+        "ajv": "^8.11.0",
+        "async": "^3.2.3",
+        "bluebird": "^3.7.2",
+        "body-parser": "^1.20.0",
+        "cors": "^2.8.5",
+        "ejs": "^3.1.8",
+        "esm": "^3.2.25",
+        "express": "^4.18.1",
+        "lodash": "^4.17.21",
+        "moment": "^2.29.3",
+        "mongoose": "^6.3.3",
+        "node-cron": "^3.0.0",
+        "require-all": "^3.0.0"
+    },
+    "devDependencies": {
+        "dotenv": "^16.0.1",
+        "eslint": "^8.15.0",
+        "husky": "^8.0.1",
+        "prettier": "^2.6.2"
+    },
+    "prettier": {
+        "trailingComma": "none",
+        "tabWidth": 4,
+        "semi": false,
+        "singleQuote": false,
+        "arrowParens": "always"
+    },
+    "eslintConfig": {
+        "env": {
+            "browser": true,
+            "es6": true
+        },
+        "extends": "eslint:recommended",
+        "parserOptions": {
+            "ecmaVersion": 8,
+            "sourceType": "module"
+        },
+        "rules": {
+            "no-undef": 1,
+            "no-unused-vars": 1,
+            "indent": [
+                "error",
+                4
+            ],
+            "linebreak-style": [
+                "error",
+                "unix"
+            ],
+            "quotes": [
+                "error",
+                "double"
+            ],
+            "semi": [
+                "error",
+                "never"
+            ]
+        },
+        "globals": {
+            "Router": true,
+            "global": true,
+            "app": true,
+            "ajv": true,
+            "_": true,
+            "env": true,
+            "ValidateRequest": true,
+            "PersonModel": true,
+            "mongoose": true,
+            "Schema": true,
+            "Person": true,
+            "require": true,
+            "ObjectId": true,
+            "pwd": true
+        }
+    },
+    "bugs": {
+        "url": "https://github.com/WohligTechnology/WohligFramework/issues"
+    },
+    "homepage": "https://github.com/WohligTechnology/WohligFramework#readme",
+    "directories": {
+        "lib": "lib"
+    }
+}

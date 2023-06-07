@@ -1,0 +1,45 @@
+name: Build-Push-Commit
+
+on:
+    # Trigger the workflow on push,
+    # but only for the pre-production branch
+    push:
+        branches:
+            - pre-production
+
+env:
+    AWS_REPOSITORY_URL: ${{ secrets.AWS_REPOSITORY_URL }}
+    GITHUB_TOKEN: ${{ secrets.AWS_GITHUB_TOKEN }}
+
+jobs:
+    Build-Push-Commit:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: eu-central-1
+
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
+
+            - uses: actions/checkout@v2
+            - name: Build the Docker image
+              run: |
+                  docker build -t $AWS_REPOSITORY_URL:$GITHUB_REF_NAME-$GITHUB_SHA . 
+                  docker push $AWS_REPOSITORY_URL:$GITHUB_REF_NAME-$GITHUB_SHA
+
+            - name: Gitops release
+              uses: DenisPalnitsky/gitops-release@v9
+              with:
+                  filename: "deployment.apps/wohlig-framework.yaml"
+                  key: "image"
+                  value: "$AWS_REPOSITORY_URL:$GITHUB_REF_NAME-$GITHUB_SHA"
+                  github-token: "${{ secrets.AWS_GITHUB_TOKEN }}"
+                  github-org-and-repo: "Wohlig/Wohlig-ENV"
+                  github-username: $GITHUB_ACTOR
+                  github-user-mail: $GITHUB_ACTOR@wohlig.com
