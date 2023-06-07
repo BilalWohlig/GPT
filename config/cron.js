@@ -7,7 +7,7 @@
 
 if (process.env.gptCron) {
     console.log("GPT CRONS ARE ACTIVE")
-    cron.schedule("48 */1 * * *", async () => {
+    cron.schedule("5,25,45 * * * *", async () => {
         try {
             console.log("GPT Running", new Date().toLocaleString())
             // let pineconeArr = []
@@ -20,13 +20,25 @@ if (process.env.gptCron) {
                 { status: "goneToGPT" }
             )
             for (let newsItem of news) {
+                if (!newsItem.image) {
+                    newsItem.status = "noImage"
+                    console.lg("No Image")
+                    await newsItem.save()
+                    continue
+                }
                 // check if this news already exists in the database
                 const sameNews = await News.findOne({
-                    $or: [
-                        { newsLink: newsItem.newsLink },
-                        { fullContent: newsItem.fullContent }
-                    ],
-                    status: "ready"
+                    $and: [
+                        {
+                            $or: [
+                                { newsLink: newsItem.newsLink },
+                                { fullContent: newsItem.fullContent }
+                            ]
+                        },
+                        {
+                            $or: [{ status: "ready" }, { reviewed: true }]
+                        }
+                    ]
                 }).exec()
                 if (sameNews) {
                     console.log("Same News")
@@ -610,12 +622,9 @@ if (process.env.gptCron) {
                                 newsItem.s3ImgUrl = ""
                                 newsItem.imgixUrlLowRes = ""
                                 newsItem.imgixUrlHighRes = ""
-                                newsItem.status = "ready"
+                                newsItem.status = "noImage"
                                 await newsItem.save()
                                 console.log("Done")
-                                await AlgoliaModel.sendAlgoliaDataForOneObject(
-                                    newsItem
-                                )
                             }
                         } catch (error) {
                             console.error("saving error", error)
